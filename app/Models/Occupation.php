@@ -8,30 +8,34 @@ use Illuminate\Database\Eloquent\Model;
 class Occupation extends Model
 {
     use HasFactory;
-    protected $fillable = ['name','parent_id'];
 
-    public function parent(){
-        return $this->belongsTo(Occupation::class,'parent_id');
+    protected $fillable = ['name', 'parent_id'];
+
+    public function parent()
+    {
+        return $this->belongsTo(Occupation::class, 'parent_id');
     }
-    public function children(){
-        return $this->hasMany(Occupation::class,'parent_id');
+
+    public function children()
+    {
+        return $this->hasMany(Occupation::class, 'parent_id');
+    }
+
+    public function tree()
+    {
+        $ids = [];
+        foreach ($this->children as $child) {
+            $ids[] = $child->id;
+            $ids = array_merge($ids, $child->tree());
+        }
+        return $ids;
     }
 
     public function organizations()
     {
-        return $this->belongsToMany(Organization::class,'organization_occupations','occupation_id','organization_id');
+        return $this->belongsToMany(Organization::class, 'organization_occupations', 'occupation_id', 'organization_id');
     }
 
-    public function getDepthAttribute(): int
-    {
-        $depth = 0;
-        $current = $this->parent;
-        while ($current) {
-            $depth++;
-            $current = $current->parent;
-        }
-        return $depth;
-    }
 
     protected static function booted()
     {

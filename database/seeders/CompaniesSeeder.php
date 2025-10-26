@@ -27,7 +27,7 @@ class CompaniesSeeder extends Seeder
             $level2b = Occupation::factory()->childOf($root)->create(['name' => $faker->jobTitle]);
             $level3a = Occupation::factory()->childOf($level2a)->create(['name' => $faker->jobTitle]);
 
-            $occupations += [$root, $level2a, $level2b, $level3a];
+            $occupations = array_merge($occupations, [$root, $level2a, $level2b, $level3a]);
         }
 
         // --- 2. Create 5 to 10 houses ---
