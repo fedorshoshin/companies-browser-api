@@ -40,7 +40,7 @@ class OrganizationController extends Controller
         $request->validate([
             'lat' => 'required|numeric',
             'lng' => 'required|numeric',
-            'radius' => 'required|numeric', // in km
+            'radius' => 'required|numeric',
         ]);
 
         $lat = $request->lat;
@@ -49,11 +49,28 @@ class OrganizationController extends Controller
 
         $organizations = Organization::select('organizations.*')
             ->join('houses', 'organizations.house_id', '=', 'houses.id')
-            ->selectRaw("6371 * acos(cos(radians(?)) * cos(radians(houses.latitude)) * cos(radians(houses.longitude) - radians(?)) + sin(radians(?)) * sin(radians(houses.latitude))) AS distance", [$lat, $lng, $lat])
-            ->having('distance', '<=', $radius)
+            ->selectRaw(
+                "6371 * acos(
+            cos(radians(?)) *
+            cos(radians(houses.latitude)) *
+            cos(radians(houses.longitude) - radians(?)) +
+            sin(radians(?)) *
+            sin(radians(houses.latitude))
+        ) AS distance",
+                [$lat, $lng, $lat]
+            )
+            ->whereRaw(
+                "6371 * acos(
+            cos(radians(?)) *
+            cos(radians(houses.latitude)) *
+            cos(radians(houses.longitude) - radians(?)) +
+            sin(radians(?)) *
+            sin(radians(houses.latitude))
+        ) <= ?",
+                [$lat, $lng, $lat, $radius]
+            )
             ->with('occupations', 'phones', 'house')
             ->get();
-
         return response()->json($organizations);
     }
 
@@ -66,7 +83,7 @@ class OrganizationController extends Controller
         if (!$occupation) {
             return response()->json([]);
         }
-        $occupationIds = $occupation->tree(); // we need to implement this method
+        $occupationIds = $occupation->tree();
         $occupationIds[] = $occupation->id;
 
         $organizations = Organization::whereHas('occupations', function ($q) use ($occupationIds) {

@@ -11,17 +11,16 @@ Route::prefix('organizations')->group(function () {
 
     Route::get('search/by-occupation-name', [OrganizationController::class, 'byOccupationName']);
     Route::get('search/by-name', [OrganizationController::class, 'byName']);
+    Route::get('by-location', [OrganizationController::class, 'byLocation']);
 
     Route::get('{id}', [OrganizationController::class, 'show']);
 
     Route::get('by-house/{id}', [OrganizationController::class, 'byHouse']);
 
-    Route::get('by-location/{location}', [OrganizationController::class, 'byLocation']);
 
     Route::get('by-occupation/{occupation}', [OrganizationController::class, 'byOccupation']);
 
 });
 
 Route::get('houses', [HouseController::class, 'index']);
-
 Route::get('occupations', array(OccupationController::class, 'index'));

@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\House;
 use App\Models\Occupation;
 use App\Models\Organization;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 
